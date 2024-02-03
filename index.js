@@ -36,7 +36,10 @@ app.get('/', (req, res) => {
 app.get('/api/hello', (req, res) => {
   res.send('Hello from the server!');
 });
-
+// New route: Say Hello
+app.get('/api/hello1', (req, res) => {
+  res.send('Hello1 from the server!');
+});
 // Get all contacts
 app.get('/api/contacts', async (req, res) => {
   try {
