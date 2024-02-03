@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -10,17 +10,19 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/contactFormDB', {
+const uri = "mongodb+srv://zenosubash:zeno123456@cluster0.o8gbsbf.mongodb.net/?retryWrites=true&w=majority";
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 // Define mongoose schema and model (models/Contact.js)
-const Contact = mongoose.model('Contact', {
-  name: String,
-  email: String,
-  phone: String,
-});
+const Contact = client.db("contactFormDB").collection("contacts");
 
 // Middleware
 app.use(bodyParser.json());
@@ -29,14 +31,16 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => {
   res.send('Hello, this is the contact form API!');
 });
+
 // New route: Say Hello
 app.get('/api/hello', (req, res) => {
-    res.send('Hello from the server!');
-  });
+  res.send('Hello from the server!');
+});
+
 // Get all contacts
 app.get('/api/contacts', async (req, res) => {
   try {
-    const contacts = await Contact.find();
+    const contacts = await Contact.find().toArray();
     res.json(contacts);
   } catch (error) {
     console.error(error);
@@ -48,8 +52,7 @@ app.get('/api/contacts', async (req, res) => {
 app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, phone } = req.body;
-    const newContact = new Contact({ name, email, phone });
-    await newContact.save();
+    await Contact.insertOne({ name, email, phone });
     res.json({ message: 'Contact saved successfully' });
   } catch (error) {
     console.error(error);
@@ -60,3 +63,17 @@ app.post('/api/contact', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// Connect to MongoDB and start the server
+async function run() {
+  try {
+    await client.connect();
+    console.log("Connected to MongoDB");
+    await app.listen(PORT);
+    console.log(`Server is running on port ${PORT}`);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+run().catch(console.dir);
