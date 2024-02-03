@@ -29,7 +29,10 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => {
   res.send('Hello, this is the contact form API!');
 });
-
+// New route: Say Hello
+app.get('/api/hello', (req, res) => {
+    res.send('Hello from the server!');
+  });
 // Get all contacts
 app.get('/api/contacts', async (req, res) => {
   try {
