@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb'); // Import ServerApiVersion
+const { MongoClient } = require('mongodb');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -12,11 +12,6 @@ app.use(cors());
 // MongoDB connection
 const uri = "mongodb+srv://zenosubash:zeno123456@cluster0.o8gbsbf.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -36,10 +31,12 @@ app.get('/', (req, res) => {
 app.get('/api/hello', (req, res) => {
   res.send('Hello from the server!');
 });
-// New route: Say Hello
+
+// New route: Say Hello1
 app.get('/api/hello1', (req, res) => {
   res.send('Hello1 from the server!');
 });
+
 // Get all contacts
 app.get('/api/contacts', async (req, res) => {
   try {
@@ -66,17 +63,3 @@ app.post('/api/contact', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-// Connect to MongoDB and start the server
-async function run() {
-  try {
-    await client.connect();
-    console.log("Connected to MongoDB");
-    await app.listen(PORT);
-    console.log(`Server is running on port ${PORT}`);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-run().catch(console.dir);
